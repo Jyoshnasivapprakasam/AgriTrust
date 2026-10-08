@@ -1,0 +1,29 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# Next.js
+.next/
+out/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.env
+
+# Hardhat
+cache/
+artifacts/
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
