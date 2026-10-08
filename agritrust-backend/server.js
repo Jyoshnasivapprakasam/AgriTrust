@@ -2,8 +2,22 @@ import express from "express";
 import cors from "cors";
 import { ethers } from "ethers";
 import fs from "fs";
+import Database from "better-sqlite3";
 
 const app = express();
+const db = new Database("agritrust.db");
+
+db.prepare(`
+    CREATE TABLE IF NOT EXISTS sensor_readings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        temperature REAL,
+        humidity REAL,
+        moisture REAL,
+        quantity REAL,
+        status TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+`).run();
 
 app.use(cors());
 app.use(express.json());
@@ -47,10 +61,25 @@ app.post("/sensor", async (req, res) => {
             status
         };
 
+        // Store reading in SQLite
+        db.prepare(`
+            INSERT INTO sensor_readings
+            (temperature, humidity, moisture, quantity, status)
+            VALUES (?, ?, ?, ?, ?)
+        `).run(
+            temperature,
+            humidity,
+            moisture,
+            quantity,
+            status
+        );
+
+        // Update blockchain status
         const tx = await contract.updateStatus(1, status);
         await tx.wait();
 
         console.log("Sensor:", latestSensorData);
+        console.log("Saved to database");
         console.log("Blockchain status updated:", status);
 
         res.json(latestSensorData);
@@ -143,6 +172,24 @@ app.get("/loan/status", (req, res) => {
     res.json({
         loanStatus: loanStatus
     });
+});
+
+app.get("/sensor/history", (req, res) => {
+    try {
+        const readings = db.prepare(`
+            SELECT *
+            FROM sensor_readings
+            ORDER BY id DESC
+            LIMIT 100
+        `).all();
+
+        res.json(readings);
+
+    } catch (error) {
+        res.status(500).json({
+            error: error.message
+        });
+    }
 });
 
 app.get("/", (req, res) => {

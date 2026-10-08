@@ -30,7 +30,7 @@ export default function Home() {
     const fetchSensorData = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/stream"
+          "http://localhost:5000/sensor"
         );
 
         if (!response.ok) {
