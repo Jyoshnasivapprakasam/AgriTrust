@@ -34,7 +34,7 @@ const artifact = JSON.parse(
 );
 
 const contract = new ethers.Contract(
-    "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+    "0x8ac87219a0F5639BC01b470F87BA2b26356CB2B9",
     artifact.abi,
     wallet
 );
@@ -148,12 +148,13 @@ app.get("/receipt/:id", async (req, res) => {
 
         res.json({
             tokenId: receipt[0].toString(),
-            farmer: receipt[1],
-            commodity: receipt[2],
-            quantity: receipt[3].toString(),
-            value: receipt[4].toString(),
-            active: receipt[5],
-            status: receipt[6]
+            owner: receipt[1],
+            farmer: receipt[2],
+            commodity: receipt[3],
+            quantity: receipt[4].toString(),
+            value: receipt[5].toString(),
+            active: receipt[6],
+            status: receipt[7]
         });
 
     } catch (error) {

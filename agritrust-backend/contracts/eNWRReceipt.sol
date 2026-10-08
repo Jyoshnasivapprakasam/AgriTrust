@@ -7,6 +7,7 @@ contract eNWRReceipt {
 
     struct Receipt {
         uint256 tokenId;
+        address owner;
         string farmer;
         string commodity;
         uint256 quantity;
@@ -19,6 +20,7 @@ contract eNWRReceipt {
 
     event ReceiptCreated(
         uint256 tokenId,
+        address owner,
         string farmer,
         string commodity,
         uint256 quantity,
@@ -41,6 +43,7 @@ contract eNWRReceipt {
 
         receipts[tokenId] = Receipt(
             tokenId,
+            msg.sender,
             farmer,
             commodity,
             quantity,
@@ -53,6 +56,7 @@ contract eNWRReceipt {
 
         emit ReceiptCreated(
             tokenId,
+            msg.sender,
             farmer,
             commodity,
             quantity,
@@ -85,6 +89,7 @@ contract eNWRReceipt {
         view
         returns (
             uint256,
+            address,
             string memory,
             string memory,
             uint256,
@@ -97,6 +102,7 @@ contract eNWRReceipt {
 
         return (
             receipt.tokenId,
+            receipt.owner,
             receipt.farmer,
             receipt.commodity,
             receipt.quantity,
