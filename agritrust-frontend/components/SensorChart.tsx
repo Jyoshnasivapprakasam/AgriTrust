@@ -27,16 +27,13 @@ export default function SensorChart({
 }: SensorChartProps) {
   return (
     <div className="h-[340px] w-full">
-      <ResponsiveContainer
-        width="100%"
-        height="100%"
-      >
+      <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={data}
           margin={{
             top: 15,
-            right: 15,
-            left: -10,
+            right: 20,
+            left: -12,
             bottom: 5,
           }}
         >
@@ -55,6 +52,7 @@ export default function SensorChart({
             axisLine={false}
             tickLine={false}
             tickMargin={10}
+            minTickGap={18}
           />
 
           <YAxis
@@ -65,11 +63,12 @@ export default function SensorChart({
             axisLine={false}
             tickLine={false}
             tickMargin={10}
+            width={38}
           />
 
           <Tooltip
             cursor={{
-              stroke: "#dfe5dc",
+              stroke: "#cfd8cf",
               strokeWidth: 1,
               strokeDasharray: "4 4",
             }}
@@ -77,26 +76,29 @@ export default function SensorChart({
               borderRadius: "14px",
               border: "1px solid #dfe5dc",
               backgroundColor: "#ffffff",
-              padding: "10px 12px",
+              padding: "11px 13px",
               boxShadow: "0 10px 30px rgba(23,32,24,0.08)",
               fontSize: "12px",
             }}
             labelStyle={{
               color: "#172018",
               fontWeight: 700,
-              marginBottom: "5px",
+              marginBottom: "7px",
+            }}
+            itemStyle={{
+              padding: "2px 0",
             }}
           />
 
           <Legend
             verticalAlign="bottom"
-            height={35}
+            height={38}
             iconType="circle"
             iconSize={7}
             wrapperStyle={{
               fontSize: "11px",
               color: "#6b756c",
-              paddingTop: "12px",
+              paddingTop: "13px",
             }}
           />
 
@@ -113,6 +115,7 @@ export default function SensorChart({
               stroke: "#ffffff",
             }}
             animationDuration={400}
+            isAnimationActive
           />
 
           <Line
@@ -128,6 +131,7 @@ export default function SensorChart({
               stroke: "#ffffff",
             }}
             animationDuration={400}
+            isAnimationActive
           />
 
           <Line
@@ -143,6 +147,7 @@ export default function SensorChart({
               stroke: "#ffffff",
             }}
             animationDuration={400}
+            isAnimationActive
           />
         </LineChart>
       </ResponsiveContainer>

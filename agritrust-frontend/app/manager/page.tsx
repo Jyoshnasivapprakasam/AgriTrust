@@ -10,6 +10,7 @@ import {
   Package,
   ShieldCheck,
   Warehouse,
+  ArrowRight,
 } from "lucide-react";
 
 interface ReceiptResponse {
@@ -91,57 +92,62 @@ export default function ManagerPage() {
     <main className="min-h-screen bg-[#f4f6f1] lg:pl-64">
       <Navbar />
 
-      <div className="mx-auto max-w-[1250px] px-5 py-7 md:px-8 md:py-9">
+      <div className="mx-auto max-w-[1400px] px-5 py-7 md:px-8 lg:py-9">
 
         {/* Header */}
-        <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-[#176b3a]">
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-green-50">
-                <Warehouse size={15} />
-              </span>
-
-              Warehouse Manager
-            </div>
-
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-[#172018] md:text-[32px]">
-              Paddy Intake Portal
-            </h1>
-
-            <p className="mt-2 max-w-xl text-sm leading-6 text-gray-500">
-              Record incoming paddy, verify the storage asset, and
-              create its digital receipt.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 rounded-xl border border-[#dfe5dc] bg-white px-4 py-3 shadow-sm">
-            <ShieldCheck
-              size={17}
-              className="text-[#176b3a]"
-            />
-
+        <header className="border-b border-[#dfe5dc] pb-7">
+          <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div>
-              <p className="text-xs font-bold text-[#172018]">
-                Secure Intake
-              </p>
+              <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#176b3a]">
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#e8f3eb]">
+                  <Warehouse size={14} />
+                </span>
 
-              <p className="text-[10px] text-gray-400">
-                e-NWR enabled
+                Warehouse Manager
+              </div>
+
+              <h1 className="mt-3 text-3xl font-bold tracking-tight text-[#172018] md:text-4xl">
+                Paddy Intake Portal
+              </h1>
+
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6b756c]">
+                Record incoming paddy, verify the storage asset, and
+                create its digital warehouse receipt.
               </p>
             </div>
+
+            <div className="flex w-fit items-center gap-3 rounded-xl border border-[#dfe5dc] bg-white px-4 py-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#e8f3eb]">
+                <ShieldCheck
+                  size={17}
+                  className="text-[#176b3a]"
+                />
+              </div>
+
+              <div>
+                <p className="text-xs font-bold text-[#172018]">
+                  Secure Intake
+                </p>
+
+                <p className="mt-0.5 text-[10px] text-[#8a928b]">
+                  e-NWR enabled
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
+        </header>
 
         {/* Main Content */}
-        <div className="mt-8 grid gap-5 xl:grid-cols-[1fr_340px]">
+        <div className="mt-7 grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
 
           {/* Intake Form */}
-          <div className="rounded-2xl border border-[#dfe5dc] bg-white shadow-sm">
+          <section className="border border-[#dfe5dc] bg-white">
+
             <div className="border-b border-[#edf0eb] px-6 py-5 md:px-7">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-50">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#e8f3eb]">
                   <Package
-                    size={21}
+                    size={20}
                     className="text-[#176b3a]"
                   />
                 </div>
@@ -151,7 +157,7 @@ export default function ManagerPage() {
                     Intake Details
                   </h2>
 
-                  <p className="mt-0.5 text-xs text-gray-500">
+                  <p className="mt-0.5 text-xs text-[#8a928b]">
                     Enter the physical paddy details below.
                   </p>
                 </div>
@@ -162,11 +168,12 @@ export default function ManagerPage() {
               onSubmit={handleSubmit}
               className="space-y-5 px-6 py-6 md:px-7"
             >
+
               {/* Farmer */}
               <div>
                 <label
                   htmlFor="farmer"
-                  className="text-xs font-bold uppercase tracking-wide text-gray-500"
+                  className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#6b756c]"
                 >
                   Farmer Name
                 </label>
@@ -180,7 +187,7 @@ export default function ManagerPage() {
                   }
                   placeholder="Enter farmer name"
                   required
-                  className="mt-2 w-full rounded-xl border border-[#dfe5dc] bg-[#fafbf9] px-4 py-3 text-sm text-[#172018] outline-none transition placeholder:text-gray-400 focus:border-[#176b3a] focus:bg-white focus:ring-4 focus:ring-green-50"
+                  className="mt-2 w-full rounded-lg border border-[#dfe5dc] bg-[#fafbf9] px-4 py-3 text-sm text-[#172018] outline-none transition placeholder:text-[#a0a8a1] focus:border-[#176b3a] focus:bg-white focus:ring-4 focus:ring-[#e8f3eb]"
                 />
               </div>
 
@@ -188,7 +195,7 @@ export default function ManagerPage() {
               <div>
                 <label
                   htmlFor="commodity"
-                  className="text-xs font-bold uppercase tracking-wide text-gray-500"
+                  className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#6b756c]"
                 >
                   Commodity
                 </label>
@@ -199,7 +206,7 @@ export default function ManagerPage() {
                   onChange={(event) =>
                     setCommodity(event.target.value)
                   }
-                  className="mt-2 w-full rounded-xl border border-[#dfe5dc] bg-[#fafbf9] px-4 py-3 text-sm font-medium text-[#172018] outline-none transition focus:border-[#176b3a] focus:bg-white focus:ring-4 focus:ring-green-50"
+                  className="mt-2 w-full rounded-lg border border-[#dfe5dc] bg-[#fafbf9] px-4 py-3 text-sm font-medium text-[#172018] outline-none transition focus:border-[#176b3a] focus:bg-white focus:ring-4 focus:ring-[#e8f3eb]"
                 >
                   <option value="Paddy">
                     Paddy
@@ -212,7 +219,7 @@ export default function ManagerPage() {
                 <div>
                   <label
                     htmlFor="quantity"
-                    className="text-xs font-bold uppercase tracking-wide text-gray-500"
+                    className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#6b756c]"
                   >
                     Quantity
                   </label>
@@ -227,14 +234,14 @@ export default function ManagerPage() {
                     }
                     placeholder="Enter quantity"
                     required
-                    className="mt-2 w-full rounded-xl border border-[#dfe5dc] bg-[#fafbf9] px-4 py-3 text-sm text-[#172018] outline-none transition placeholder:text-gray-400 focus:border-[#176b3a] focus:bg-white focus:ring-4 focus:ring-green-50"
+                    className="mt-2 w-full rounded-lg border border-[#dfe5dc] bg-[#fafbf9] px-4 py-3 text-sm text-[#172018] outline-none transition placeholder:text-[#a0a8a1] focus:border-[#176b3a] focus:bg-white focus:ring-4 focus:ring-[#e8f3eb]"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="value"
-                    className="text-xs font-bold uppercase tracking-wide text-gray-500"
+                    className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#6b756c]"
                   >
                     Paddy Value
                   </label>
@@ -249,15 +256,15 @@ export default function ManagerPage() {
                     }
                     placeholder="Enter value"
                     required
-                    className="mt-2 w-full rounded-xl border border-[#dfe5dc] bg-[#fafbf9] px-4 py-3 text-sm text-[#172018] outline-none transition placeholder:text-gray-400 focus:border-[#176b3a] focus:bg-white focus:ring-4 focus:ring-green-50"
+                    className="mt-2 w-full rounded-lg border border-[#dfe5dc] bg-[#fafbf9] px-4 py-3 text-sm text-[#172018] outline-none transition placeholder:text-[#a0a8a1] focus:border-[#176b3a] focus:bg-white focus:ring-4 focus:ring-[#e8f3eb]"
                   />
                 </div>
               </div>
 
               {/* Error */}
               {error && (
-                <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-sm text-red-700">
-                  <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-red-500" />
+                <div className="flex items-start gap-3 border-l-4 border-red-500 bg-red-50 px-4 py-3.5 text-sm text-red-700">
+                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-red-500" />
 
                   <span>{error}</span>
                 </div>
@@ -265,7 +272,7 @@ export default function ManagerPage() {
 
               {/* Success */}
               {message && (
-                <div className="flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3.5 text-sm text-green-700">
+                <div className="flex items-start gap-3 border-l-4 border-green-500 bg-green-50 px-4 py-3.5 text-sm text-green-700">
                   <CheckCircle2
                     size={18}
                     className="mt-0.5 shrink-0"
@@ -279,7 +286,7 @@ export default function ManagerPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#176b3a] px-5 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#11552d] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#176b3a] px-5 py-3.5 text-sm font-bold text-white transition hover:bg-[#11552d] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? (
                   <>
@@ -299,120 +306,123 @@ export default function ManagerPage() {
                 )}
               </button>
 
-              <p className="text-center text-[10px] text-gray-400">
+              <p className="text-center text-[10px] text-[#8a928b]">
                 The information will be submitted to the AgriTrust
                 backend for receipt creation.
               </p>
             </form>
-          </div>
+          </section>
 
-          {/* Process Panel */}
-          <div className="rounded-2xl border border-[#dfe5dc] bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="font-bold text-[#172018]">
-                  Intake Process
-                </h2>
+          {/* Intake Process */}
+          <section className="border border-[#dfe5dc] bg-white">
 
-                <p className="mt-1 text-xs text-gray-500">
-                  From physical grain to digital asset.
-                </p>
-              </div>
+            <div className="border-b border-[#edf0eb] px-6 py-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="font-bold text-[#172018]">
+                    Intake Process
+                  </h2>
 
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-green-50">
-                <FileCheck2
-                  size={17}
-                  className="text-[#176b3a]"
-                />
+                  <p className="mt-1 text-xs text-[#8a928b]">
+                    From physical grain to digital asset.
+                  </p>
+                </div>
+
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#e8f3eb]">
+                  <FileCheck2
+                    size={17}
+                    className="text-[#176b3a]"
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="mt-7 space-y-0">
+            <div className="px-6 py-6">
 
               {/* Step 1 */}
-              <div className="relative flex gap-4 pb-7">
-                <div className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-green-50 text-xs font-bold text-[#176b3a]">
+              <div className="relative flex gap-4 pb-8">
+                <div className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#e8f3eb] text-[10px] font-bold text-[#176b3a]">
                   01
                 </div>
 
                 <div>
-                  <p className="font-semibold text-[#172018]">
+                  <p className="text-sm font-semibold text-[#172018]">
                     Record intake
                   </p>
 
-                  <p className="mt-1 text-xs leading-5 text-gray-500">
+                  <p className="mt-1 text-xs leading-5 text-[#6b756c]">
                     Enter the farmer, commodity, quantity and
                     declared value.
                   </p>
                 </div>
 
-                <span className="absolute left-[17px] top-9 h-10 w-px bg-[#e5ebe3]" />
+                <span className="absolute left-[17px] top-9 h-12 w-px bg-[#dfe5dc]" />
               </div>
 
               {/* Step 2 */}
-              <div className="relative flex gap-4 pb-7">
-                <div className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-green-50 text-xs font-bold text-[#176b3a]">
+              <div className="relative flex gap-4 pb-8">
+                <div className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#e8f3eb] text-[10px] font-bold text-[#176b3a]">
                   02
                 </div>
 
                 <div>
-                  <p className="font-semibold text-[#172018]">
+                  <p className="text-sm font-semibold text-[#172018]">
                     Create receipt
                   </p>
 
-                  <p className="mt-1 text-xs leading-5 text-gray-500">
+                  <p className="mt-1 text-xs leading-5 text-[#6b756c]">
                     The backend creates the digital e-NWR receipt
                     for the stored commodity.
                   </p>
                 </div>
 
-                <span className="absolute left-[17px] top-9 h-10 w-px bg-[#e5ebe3]" />
+                <span className="absolute left-[17px] top-9 h-12 w-px bg-[#dfe5dc]" />
               </div>
 
               {/* Step 3 */}
               <div className="flex gap-4">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-green-50 text-xs font-bold text-[#176b3a]">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#e8f3eb] text-[10px] font-bold text-[#176b3a]">
                   03
                 </div>
 
                 <div>
-                  <p className="font-semibold text-[#172018]">
+                  <p className="text-sm font-semibold text-[#172018]">
                     Monitor storage
                   </p>
 
-                  <p className="mt-1 text-xs leading-5 text-gray-500">
+                  <p className="mt-1 text-xs leading-5 text-[#6b756c]">
                     Sensor conditions continue to be tracked after
                     intake.
                   </p>
                 </div>
               </div>
-            </div>
 
-            {/* Backend status */}
-            <div className="mt-8 rounded-xl border border-[#e7ece4] bg-[#fafbf9] p-4">
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-green-500" />
+              {/* Backend Status */}
+              <div className="mt-8 border border-[#e7ece4] bg-[#fafbf9] p-4">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-green-500" />
 
-                <span className="text-xs font-bold text-[#172018]">
-                  Backend connected
-                </span>
+                  <span className="text-xs font-bold text-[#172018]">
+                    Backend connected
+                  </span>
+                </div>
+
+                <p className="mt-1.5 text-[10px] leading-4 text-[#6b756c]">
+                  Receipt requests are processed through the AgriTrust
+                  backend on port 5000.
+                </p>
               </div>
-
-              <p className="mt-1.5 text-[10px] leading-4 text-gray-500">
-                Receipt requests are processed through the AgriTrust
-                backend on port 5000.
-              </p>
             </div>
-          </div>
+          </section>
         </div>
 
         {/* Created Receipt */}
         {receipt && (
-          <div className="mt-5 overflow-hidden rounded-2xl border border-green-200 bg-white shadow-sm">
+          <section className="mt-5 overflow-hidden border border-green-200 bg-white">
 
-            <div className="flex items-center justify-between border-b border-green-100 bg-green-50/60 px-6 py-5">
+            <div className="flex flex-col justify-between gap-4 border-b border-green-100 bg-green-50/60 px-6 py-5 sm:flex-row sm:items-center">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white">
                   <CheckCircle2
                     className="text-green-600"
                     size={21}
@@ -430,53 +440,61 @@ export default function ManagerPage() {
                 </div>
               </div>
 
-              <span className="hidden rounded-full border border-green-200 bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-green-700 sm:inline-flex">
+              <span className="flex w-fit items-center gap-1.5 rounded-full border border-green-200 bg-white px-3 py-1.5 text-[9px] font-bold uppercase tracking-wide text-green-700">
+                <CheckCircle2 size={12} />
                 Created
               </span>
             </div>
 
-            <div className="grid gap-5 px-6 py-6 sm:grid-cols-2 lg:grid-cols-4">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
+            <div className="grid gap-px bg-[#edf0eb] sm:grid-cols-2 lg:grid-cols-4">
+
+              <div className="bg-white p-5">
+                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#8a928b]">
                   Token ID
                 </p>
 
-                <p className="mt-2 font-semibold text-[#172018]">
+                <p className="mt-2 text-lg font-bold text-[#172018]">
                   {receipt.tokenId ?? "Generated"}
                 </p>
               </div>
 
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
+              <div className="bg-white p-5">
+                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#8a928b]">
                   Farmer
                 </p>
 
-                <p className="mt-2 font-semibold text-[#172018]">
+                <p className="mt-2 truncate text-sm font-semibold text-[#172018]">
                   {receipt.farmer ?? farmer}
                 </p>
               </div>
 
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
+              <div className="bg-white p-5">
+                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#8a928b]">
                   Quantity
                 </p>
 
-                <p className="mt-2 font-semibold text-[#172018]">
+                <p className="mt-2 text-sm font-semibold text-[#172018]">
                   {receipt.quantity ?? quantity}
                 </p>
               </div>
 
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
+              <div className="bg-white p-5">
+                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#8a928b]">
                   Status
                 </p>
 
-                <p className="mt-2 font-semibold text-green-600">
+                <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-green-600">
+                  <span className="h-2 w-2 rounded-full bg-green-500" />
                   {receipt.status ?? "Created"}
                 </p>
               </div>
             </div>
-          </div>
+
+            <div className="flex items-center gap-2 border-t border-[#edf0eb] px-6 py-3.5 text-[10px] text-[#8a928b]">
+              <ArrowRight size={13} />
+              Digital receipt is now available in the Farmer Portal.
+            </div>
+          </section>
         )}
       </div>
     </main>

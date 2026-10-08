@@ -115,7 +115,6 @@ export default function Home() {
       </div>
 
       <div className="mx-auto max-w-[1540px] px-5 py-6 md:px-8 lg:px-10 lg:py-8">
-
         {/* Header */}
         <div className="relative overflow-hidden rounded-3xl border border-[#dfe5dc] bg-white px-6 py-7 shadow-sm md:px-8 md:py-8">
           <div className="absolute right-0 top-0 h-40 w-40 translate-x-12 -translate-y-12 rounded-full bg-[#e9f3e9]" />
@@ -142,10 +141,7 @@ export default function Home() {
 
             <div className="flex w-fit items-center gap-3 rounded-2xl border border-[#e0e6dd] bg-[#f8faf7] px-4 py-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white">
-                <RefreshCw
-                  size={15}
-                  className="text-[#176b3a]"
-                />
+                <RefreshCw size={15} className="text-[#176b3a]" />
               </div>
 
               <div>
@@ -171,7 +167,6 @@ export default function Home() {
 
         {/* Statistics */}
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-
           {/* Moisture */}
           <div className="rounded-2xl border border-[#dfe5dc] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
             <div className="flex items-start justify-between">
@@ -188,19 +183,13 @@ export default function Home() {
               </div>
 
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50">
-                <Droplets
-                  size={20}
-                  className="text-blue-600"
-                />
+                <Droplets size={20} className="text-blue-600" />
               </div>
             </div>
 
             <div className="mt-5 flex items-center gap-2">
               <div className="flex h-6 w-6 items-center justify-center rounded-full bg-green-50">
-                <TrendingDown
-                  size={12}
-                  className="text-green-600"
-                />
+                <TrendingDown size={12} className="text-green-600" />
               </div>
 
               <span className="text-xs font-semibold text-green-600">
@@ -225,10 +214,7 @@ export default function Home() {
               </div>
 
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50">
-                <Thermometer
-                  size={20}
-                  className="text-orange-600"
-                />
+                <Thermometer size={20} className="text-orange-600" />
               </div>
             </div>
 
@@ -253,10 +239,7 @@ export default function Home() {
               </div>
 
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-50">
-                <Waves
-                  size={20}
-                  className="text-purple-600"
-                />
+                <Waves size={20} className="text-purple-600" />
               </div>
             </div>
 
@@ -281,10 +264,7 @@ export default function Home() {
               </div>
 
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-50">
-                <Package
-                  size={20}
-                  className="text-[#176b3a]"
-                />
+                <Package size={20} className="text-[#176b3a]" />
               </div>
             </div>
 
@@ -296,17 +276,13 @@ export default function Home() {
 
         {/* Main Content */}
         <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_350px]">
-
           {/* Sensor Chart */}
           <div className="rounded-3xl border border-[#dfe5dc] bg-white p-6 shadow-sm md:p-7">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
               <div>
                 <div className="flex items-center gap-2.5">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#edf5ed]">
-                    <Activity
-                      size={16}
-                      className="text-[#176b3a]"
-                    />
+                    <Activity size={16} className="text-[#176b3a]" />
                   </div>
 
                   <h2 className="font-bold text-[#172018]">
@@ -334,10 +310,7 @@ export default function Home() {
               ) : (
                 <div className="flex h-80 flex-col items-center justify-center">
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f3f6f1]">
-                    <Activity
-                      size={20}
-                      className="text-gray-400"
-                    />
+                    <Activity size={20} className="text-gray-400" />
                   </div>
 
                   <p className="mt-4 text-sm font-medium text-gray-500">
@@ -366,10 +339,7 @@ export default function Home() {
               </div>
 
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-50">
-                <ShieldCheck
-                  size={19}
-                  className="text-[#176b3a]"
-                />
+                <ShieldCheck size={19} className="text-[#176b3a]" />
               </div>
             </div>
 
@@ -383,17 +353,13 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 <span
                   className={`h-2.5 w-2.5 rounded-full ${
-                    safe
-                      ? "bg-green-500"
-                      : "bg-yellow-500"
+                    safe ? "bg-green-500" : "bg-yellow-500"
                   }`}
                 />
 
                 <span
                   className={`text-sm font-bold ${
-                    safe
-                      ? "text-green-700"
-                      : "text-yellow-700"
+                    safe ? "text-green-700" : "text-yellow-700"
                   }`}
                 >
                   {safe
@@ -462,10 +428,7 @@ export default function Home() {
             </div>
 
             <div className="hidden h-10 w-10 items-center justify-center rounded-xl bg-[#f4f7f2] sm:flex">
-              <ArrowUpRight
-                size={18}
-                className="text-[#176b3a]"
-              />
+              <ArrowUpRight size={18} className="text-[#176b3a]" />
             </div>
           </div>
 

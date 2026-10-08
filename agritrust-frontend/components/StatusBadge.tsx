@@ -13,7 +13,7 @@ export default function StatusBadge({
 
   return (
     <div
-      className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-xs font-bold tracking-tight ${
+      className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-xs font-bold tracking-tight shadow-sm ${
         isSafe
           ? "border-green-200 bg-green-50 text-green-700"
           : "border-yellow-200 bg-yellow-50 text-yellow-700"

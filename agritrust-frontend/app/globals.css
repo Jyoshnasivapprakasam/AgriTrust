@@ -7,6 +7,8 @@
   --primary-dark: #11552d;
   --border: #dfe5dc;
   --muted: #6b756c;
+  --surface: #ffffff;
+  --surface-soft: #fafbf9;
 }
 
 * {
@@ -29,8 +31,11 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
+
+/* Form Elements */
 
 button,
 input,
@@ -42,6 +47,12 @@ textarea {
 button {
   cursor: pointer;
 }
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* Selection */
 
 ::selection {
   background: #cfe3d2;
@@ -85,6 +96,7 @@ a {
 /* Images */
 
 img {
+  display: block;
   max-width: 100%;
   height: auto;
 }
@@ -92,18 +104,31 @@ img {
 /* Focus */
 
 :focus-visible {
-  outline: 2px solid #176b3a;
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
-/* Remove default number input arrows */
+/* Number Inputs */
 
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
 }
 
-/* Smooth UI transitions */
+/* Tables */
+
+table {
+  border-collapse: collapse;
+}
+
+/* Placeholder */
+
+::placeholder {
+  color: #a0a8a1;
+  opacity: 1;
+}
+
+/* Smooth UI */
 
 button,
 a,
@@ -116,4 +141,35 @@ textarea {
     color 150ms ease,
     box-shadow 150ms ease,
     transform 150ms ease;
+}
+
+/* Mobile Tap Highlight */
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent horizontal overflow */
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+/* Reduced Motion */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
