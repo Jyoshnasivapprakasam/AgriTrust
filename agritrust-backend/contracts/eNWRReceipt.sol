@@ -12,6 +12,7 @@ contract eNWRReceipt {
         uint256 quantity;
         uint256 value;
         bool active;
+        string status;
     }
 
     mapping(uint256 => Receipt) public receipts;
@@ -22,6 +23,11 @@ contract eNWRReceipt {
         string commodity,
         uint256 quantity,
         uint256 value
+    );
+
+    event ReceiptStatusUpdated(
+        uint256 tokenId,
+        string status
     );
 
     function createReceipt(
@@ -39,7 +45,8 @@ contract eNWRReceipt {
             commodity,
             quantity,
             value,
-            true
+            true,
+            "SAFE"
         );
 
         nextReceiptId++;
@@ -55,6 +62,24 @@ contract eNWRReceipt {
         return tokenId;
     }
 
+    function updateStatus(
+        uint256 tokenId,
+        string memory newStatus
+    ) public {
+
+        require(
+            receipts[tokenId].active,
+            "Receipt does not exist"
+        );
+
+        receipts[tokenId].status = newStatus;
+
+        emit ReceiptStatusUpdated(
+            tokenId,
+            newStatus
+        );
+    }
+
     function getReceipt(uint256 tokenId)
         public
         view
@@ -64,7 +89,8 @@ contract eNWRReceipt {
             string memory,
             uint256,
             uint256,
-            bool
+            bool,
+            string memory
         )
     {
         Receipt memory receipt = receipts[tokenId];
@@ -75,7 +101,8 @@ contract eNWRReceipt {
             receipt.commodity,
             receipt.quantity,
             receipt.value,
-            receipt.active
+            receipt.active,
+            receipt.status
         );
     }
 }
