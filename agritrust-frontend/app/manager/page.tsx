@@ -1,501 +1,513 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import Navbar from "@/components/Navbar";
-import {
-  CheckCircle2,
-  ClipboardCheck,
-  FileCheck2,
-  Loader2,
-  Package,
-  ShieldCheck,
-  Warehouse,
-  ArrowRight,
-} from "lucide-react";
+import { useEffect, useState } from "react";
 
-interface ReceiptResponse {
-  tokenId?: number | string;
-  farmer?: string;
-  commodity?: string;
-  quantity?: number;
-  value?: number;
-  active?: boolean;
-  status?: string;
-}
+type SensorData = {
+  temperature: number;
+  humidity: number;
+  moisture: number;
+  quantity: number;
+  status: string;
+};
 
-export default function ManagerPage() {
-  const [farmer, setFarmer] = useState("");
-  const [commodity, setCommodity] = useState("Paddy");
-  const [quantity, setQuantity] = useState("");
-  const [value, setValue] = useState("");
+type Receipt = {
+  tokenId: string;
+  owner: string;
+  farmer: string;
+  commodity: string;
+  quantity: string;
+  value: string;
+  active: boolean;
+  status: string;
+};
 
-  const [loading, setLoading] = useState(false);
+type Application = {
+  id: number;
+  farmer: string;
+  amount: number;
+  status: string;
+  created_at: string;
+};
+
+export default function BankPortal() {
+  const [sensor, setSensor] = useState<SensorData | null>(null);
+  const [receipt, setReceipt] = useState<Receipt | null>(null);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
-  const [receipt, setReceipt] =
-    useState<ReceiptResponse | null>(null);
+  const [processing, setProcessing] = useState<number | null>(null);
+  const [farmers, setFarmers] = useState<any[]>([]);
+  const [selectedFarmer, setSelectedFarmer] = useState<any | null>(null);
+  
 
-  const handleSubmit = async (
-    event: FormEvent<HTMLFormElement>
-  ) => {
-    event.preventDefault();
+  const loadData = async () => {
+    try {
+      const [
+        sensorRes,
+        receiptRes,
+        applicationsRes,
+        farmersRes,
+      ] = await Promise.all([
+        fetch("http://localhost:5000/sensor"),
+        fetch("http://localhost:5000/receipt/7"),
+        fetch("http://localhost:5000/loan/applications"),
+        fetch("http://localhost:5000/farmers"),
+      ]);
 
-    setLoading(true);
+      setSensor(await sensorRes.json());
+      setReceipt(await receiptRes.json());
+      setApplications(await applicationsRes.json());
+      setFarmers(await farmersRes.json());
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+
+    const startMonitoring = async () => {
+      const response = await fetch("http://localhost:5000/sensor");
+      const data = await response.json();
+
+      setSensor(data);
+
+      if (data.status !== "SAFE") {
+        interval = setInterval(async () => {
+          const response = await fetch("http://localhost:5000/sensor");
+          const latest = await response.json();
+
+          setSensor(latest);
+
+          if (latest.status === "SAFE") {
+            clearInterval(interval);
+          }
+        }, 2000);
+      }
+    };
+
+    loadData();
+    startMonitoring();
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, []);
+
+  const approveLoan = async (id: number) => {
+    setProcessing(id);
     setMessage("");
-    setError("");
-    setReceipt(null);
 
     try {
-      const response = await fetch("/api/receipt", {
-        method: "POST",
+      const response = await fetch(
+        `http://localhost:5000/loan/approve/${id}`,
+        {
+          method: "POST",
+        }
+      );
 
-        headers: {
-          "Content-Type": "application/json",
-        },
-
-        body: JSON.stringify({
-          farmer,
-          commodity,
-          quantity: Number(quantity),
-          value: Number(value),
-        }),
-      });
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error("Unable to create receipt");
+        setMessage(data.error || "Approval failed.");
+        return;
       }
 
-      const data: ReceiptResponse =
-        await response.json();
+      setMessage(
+        `Loan approved. ₹${Number(
+          data.amount
+        ).toLocaleString()} credited to ${data.farmer}'s demo wallet.`
+      );
 
-      setReceipt(data);
+      await loadData();
+    } catch (error) {
+      console.error(error);
+      setMessage("Unable to approve loan.");
+    } finally {
+      setProcessing(null);
+    }
+  };
+
+  const rejectLoan = async (id: number) => {
+    setProcessing(id);
+    setMessage("");
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/loan/reject/${id}`,
+        {
+          method: "POST",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.error || "Rejection failed.");
+        return;
+      }
 
       setMessage(
-        "Paddy intake and e-NWR receipt created successfully."
+        `Loan application rejected for ${data.farmer}.`
       );
 
-      setFarmer("");
-      setQuantity("");
-      setValue("");
-    } catch (err) {
-      console.error(err);
-
-      setError(
-        "Unable to connect to the backend. Make sure it is running on port 5000."
-      );
+      await loadData();
+    } catch (error) {
+      console.error(error);
+      setMessage("Unable to reject loan.");
     } finally {
-      setLoading(false);
+      setProcessing(null);
     }
   };
 
   return (
-    <main className="min-h-screen bg-[#f4f6f1] lg:pl-64">
-      <Navbar />
+    <main className="min-h-screen bg-[#f5f7f2] px-6 py-8">
+      <div className="mx-auto max-w-7xl">
 
-      <div className="mx-auto max-w-[1400px] px-5 py-7 md:px-8 lg:py-9">
+        {/* HEADER */}
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#176b3a]">
+              AgriTrust
+            </p>
 
-        {/* Header */}
-        <header className="border-b border-[#dfe5dc] pb-7">
-          <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
-            <div>
-              <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#176b3a]">
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#e8f3eb]">
-                  <Warehouse size={14} />
-                </span>
+            <h1 className="mt-2 text-3xl font-bold text-[#172018]">
+              Bank Portal
+            </h1>
 
-                Warehouse Manager
-              </div>
-
-              <h1 className="mt-3 text-3xl font-bold tracking-tight text-[#172018] md:text-4xl">
-                Paddy Intake Portal
-              </h1>
-
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6b756c]">
-                Record incoming paddy, verify the storage asset, and
-                create its digital warehouse receipt.
-              </p>
-            </div>
-
-            <div className="flex w-fit items-center gap-3 rounded-xl border border-[#dfe5dc] bg-white px-4 py-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#e8f3eb]">
-                <ShieldCheck
-                  size={17}
-                  className="text-[#176b3a]"
-                />
-              </div>
-
-              <div>
-                <p className="text-xs font-bold text-[#172018]">
-                  Secure Intake
-                </p>
-
-                <p className="mt-0.5 text-[10px] text-[#8a928b]">
-                  e-NWR enabled
-                </p>
-              </div>
-            </div>
+            <p className="mt-2 text-sm text-gray-500">
+              Verify farmer receipts and process agricultural financing
+            </p>
           </div>
-        </header>
 
-        {/* Main Content */}
-        <div className="mt-7 grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
-
-          {/* Intake Form */}
-          <section className="border border-[#dfe5dc] bg-white">
-
-            <div className="border-b border-[#edf0eb] px-6 py-5 md:px-7">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#e8f3eb]">
-                  <Package
-                    size={20}
-                    className="text-[#176b3a]"
-                  />
-                </div>
-
-                <div>
-                  <h2 className="font-bold text-[#172018]">
-                    Intake Details
-                  </h2>
-
-                  <p className="mt-0.5 text-xs text-[#8a928b]">
-                    Enter the physical paddy details below.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <form
-              onSubmit={handleSubmit}
-              className="space-y-5 px-6 py-6 md:px-7"
-            >
-
-              {/* Farmer */}
-              <div>
-                <label
-                  htmlFor="farmer"
-                  className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#6b756c]"
-                >
-                  Farmer Name
-                </label>
-
-                <input
-                  id="farmer"
-                  type="text"
-                  value={farmer}
-                  onChange={(event) =>
-                    setFarmer(event.target.value)
-                  }
-                  placeholder="Enter farmer name"
-                  required
-                  className="mt-2 w-full rounded-lg border border-[#dfe5dc] bg-[#fafbf9] px-4 py-3 text-sm text-[#172018] outline-none transition placeholder:text-[#a0a8a1] focus:border-[#176b3a] focus:bg-white focus:ring-4 focus:ring-[#e8f3eb]"
-                />
-              </div>
-
-              {/* Commodity */}
-              <div>
-                <label
-                  htmlFor="commodity"
-                  className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#6b756c]"
-                >
-                  Commodity
-                </label>
-
-                <select
-                  id="commodity"
-                  value={commodity}
-                  onChange={(event) =>
-                    setCommodity(event.target.value)
-                  }
-                  className="mt-2 w-full rounded-lg border border-[#dfe5dc] bg-[#fafbf9] px-4 py-3 text-sm font-medium text-[#172018] outline-none transition focus:border-[#176b3a] focus:bg-white focus:ring-4 focus:ring-[#e8f3eb]"
-                >
-                  <option value="Paddy">
-                    Paddy
-                  </option>
-                </select>
-              </div>
-
-              {/* Quantity + Value */}
-              <div className="grid gap-5 md:grid-cols-2">
-                <div>
-                  <label
-                    htmlFor="quantity"
-                    className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#6b756c]"
-                  >
-                    Quantity
-                  </label>
-
-                  <input
-                    id="quantity"
-                    type="number"
-                    min="0"
-                    value={quantity}
-                    onChange={(event) =>
-                      setQuantity(event.target.value)
-                    }
-                    placeholder="Enter quantity"
-                    required
-                    className="mt-2 w-full rounded-lg border border-[#dfe5dc] bg-[#fafbf9] px-4 py-3 text-sm text-[#172018] outline-none transition placeholder:text-[#a0a8a1] focus:border-[#176b3a] focus:bg-white focus:ring-4 focus:ring-[#e8f3eb]"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="value"
-                    className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#6b756c]"
-                  >
-                    Paddy Value
-                  </label>
-
-                  <input
-                    id="value"
-                    type="number"
-                    min="0"
-                    value={value}
-                    onChange={(event) =>
-                      setValue(event.target.value)
-                    }
-                    placeholder="Enter value"
-                    required
-                    className="mt-2 w-full rounded-lg border border-[#dfe5dc] bg-[#fafbf9] px-4 py-3 text-sm text-[#172018] outline-none transition placeholder:text-[#a0a8a1] focus:border-[#176b3a] focus:bg-white focus:ring-4 focus:ring-[#e8f3eb]"
-                  />
-                </div>
-              </div>
-
-              {/* Error */}
-              {error && (
-                <div className="flex items-start gap-3 border-l-4 border-red-500 bg-red-50 px-4 py-3.5 text-sm text-red-700">
-                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-red-500" />
-
-                  <span>{error}</span>
-                </div>
-              )}
-
-              {/* Success */}
-              {message && (
-                <div className="flex items-start gap-3 border-l-4 border-green-500 bg-green-50 px-4 py-3.5 text-sm text-green-700">
-                  <CheckCircle2
-                    size={18}
-                    className="mt-0.5 shrink-0"
-                  />
-
-                  <span>{message}</span>
-                </div>
-              )}
-
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#176b3a] px-5 py-3.5 text-sm font-bold text-white transition hover:bg-[#11552d] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {loading ? (
-                  <>
-                    <Loader2
-                      size={18}
-                      className="animate-spin"
-                    />
-
-                    Creating Receipt...
-                  </>
-                ) : (
-                  <>
-                    <ClipboardCheck size={18} />
-
-                    Verify Intake & Create Receipt
-                  </>
-                )}
-              </button>
-
-              <p className="text-center text-[10px] text-[#8a928b]">
-                The information will be submitted to the AgriTrust
-                backend for receipt creation.
-              </p>
-            </form>
-          </section>
-
-          {/* Intake Process */}
-          <section className="border border-[#dfe5dc] bg-white">
-
-            <div className="border-b border-[#edf0eb] px-6 py-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="font-bold text-[#172018]">
-                    Intake Process
-                  </h2>
-
-                  <p className="mt-1 text-xs text-[#8a928b]">
-                    From physical grain to digital asset.
-                  </p>
-                </div>
-
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#e8f3eb]">
-                  <FileCheck2
-                    size={17}
-                    className="text-[#176b3a]"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="px-6 py-6">
-
-              {/* Step 1 */}
-              <div className="relative flex gap-4 pb-8">
-                <div className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#e8f3eb] text-[10px] font-bold text-[#176b3a]">
-                  01
-                </div>
-
-                <div>
-                  <p className="text-sm font-semibold text-[#172018]">
-                    Record intake
-                  </p>
-
-                  <p className="mt-1 text-xs leading-5 text-[#6b756c]">
-                    Enter the farmer, commodity, quantity and
-                    declared value.
-                  </p>
-                </div>
-
-                <span className="absolute left-[17px] top-9 h-12 w-px bg-[#dfe5dc]" />
-              </div>
-
-              {/* Step 2 */}
-              <div className="relative flex gap-4 pb-8">
-                <div className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#e8f3eb] text-[10px] font-bold text-[#176b3a]">
-                  02
-                </div>
-
-                <div>
-                  <p className="text-sm font-semibold text-[#172018]">
-                    Create receipt
-                  </p>
-
-                  <p className="mt-1 text-xs leading-5 text-[#6b756c]">
-                    The backend creates the digital e-NWR receipt
-                    for the stored commodity.
-                  </p>
-                </div>
-
-                <span className="absolute left-[17px] top-9 h-12 w-px bg-[#dfe5dc]" />
-              </div>
-
-              {/* Step 3 */}
-              <div className="flex gap-4">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#e8f3eb] text-[10px] font-bold text-[#176b3a]">
-                  03
-                </div>
-
-                <div>
-                  <p className="text-sm font-semibold text-[#172018]">
-                    Monitor storage
-                  </p>
-
-                  <p className="mt-1 text-xs leading-5 text-[#6b756c]">
-                    Sensor conditions continue to be tracked after
-                    intake.
-                  </p>
-                </div>
-              </div>
-
-              {/* Backend Status */}
-              <div className="mt-8 border border-[#e7ece4] bg-[#fafbf9] p-4">
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-green-500" />
-
-                  <span className="text-xs font-bold text-[#172018]">
-                    Backend connected
-                  </span>
-                </div>
-
-                <p className="mt-1.5 text-[10px] leading-4 text-[#6b756c]">
-                  Receipt requests are processed through the AgriTrust
-                  backend on port 5000.
-                </p>
-              </div>
-            </div>
-          </section>
+          <div
+            className={`rounded-full px-4 py-2 text-sm font-bold ${
+              sensor?.status === "SAFE"
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            Paddy: {sensor?.status || "--"}
+          </div>
         </div>
 
-        {/* Created Receipt */}
-        {receipt && (
-          <section className="mt-5 overflow-hidden border border-green-200 bg-white">
+        {/* SENSOR SUMMARY */}
+        <section className="mt-8">
+          <h2 className="text-xl font-bold text-[#172018]">
+            Storage Health
+          </h2>
 
-            <div className="flex flex-col justify-between gap-4 border-b border-green-100 bg-green-50/60 px-6 py-5 sm:flex-row sm:items-center">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white">
-                  <CheckCircle2
-                    className="text-green-600"
-                    size={21}
-                  />
+          <div className="mt-4 grid gap-4 md:grid-cols-4">
+
+            <div className="rounded-2xl bg-white p-5 shadow-sm">
+              <p className="text-xs font-bold uppercase text-gray-400">
+                Temperature
+              </p>
+              <p className="mt-2 text-2xl font-bold">
+                {sensor?.temperature ?? "--"}°C
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-white p-5 shadow-sm">
+              <p className="text-xs font-bold uppercase text-gray-400">
+                Humidity
+              </p>
+              <p className="mt-2 text-2xl font-bold">
+                {sensor?.humidity ?? "--"}%
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-white p-5 shadow-sm">
+              <p className="text-xs font-bold uppercase text-gray-400">
+                Moisture
+              </p>
+              <p className="mt-2 text-2xl font-bold">
+                {sensor?.moisture ?? "--"}%
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-white p-5 shadow-sm">
+              <p className="text-xs font-bold uppercase text-gray-400">
+                Quantity
+              </p>
+              <p className="mt-2 text-2xl font-bold">
+                {sensor?.quantity ?? "--"} kg
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* FARMER DETAILS + RECEIPT */}
+        <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
+
+          <h2 className="text-xl font-bold">
+            Farmer Digital Receipt
+          </h2>
+
+          <p className="mt-1 text-sm text-gray-500">
+            Verify the stored paddy before approving financing.
+          </p>
+
+          <div className="mt-6 grid gap-5 md:grid-cols-3">
+
+            <div>
+              <p className="text-xs uppercase text-gray-400">
+                Farmer Name
+              </p>
+              <p className="mt-1 font-bold">
+                {receipt?.farmer || "--"}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase text-gray-400">
+                Receipt ID
+              </p>
+              <p className="mt-1 font-bold">
+                #{receipt?.tokenId || "--"}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase text-gray-400">
+                Commodity
+              </p>
+              <p className="mt-1 font-bold">
+                {receipt?.commodity || "--"}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase text-gray-400">
+                Quantity
+              </p>
+              <p className="mt-1 font-bold">
+                {receipt?.quantity || "--"} kg
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase text-gray-400">
+                Paddy Value
+              </p>
+              <p className="mt-1 font-bold text-[#176b3a]">
+                ₹{Number(receipt?.value || 0).toLocaleString()}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase text-gray-400">
+                Receipt Status
+              </p>
+              <p
+                className={`mt-1 font-bold ${
+                  receipt?.status === "SAFE"
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+              >
+                {receipt?.status || "--"}
+              </p>
+            </div>
+
+          </div>
+
+          <div className="mt-6 rounded-xl bg-gray-50 p-4">
+            <p className="text-xs font-bold uppercase text-gray-400">
+              Sensor Verification
+            </p>
+
+            <p className="mt-2 text-sm text-gray-700">
+              Temperature: {sensor?.temperature ?? "--"}°C
+              {"  •  "}
+              Humidity: {sensor?.humidity ?? "--"}%
+              {"  •  "}
+              Moisture: {sensor?.moisture ?? "--"}%
+            </p>
+          </div>
+        </section>
+
+
+        <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-bold">
+            Farmer Database
+          </h2>
+
+          <p className="mt-1 text-sm text-gray-500">
+            Registered farmers in AgriTrust
+          </p>
+
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            {farmers.map((farmer) => (
+            <button
+              key={farmer.id}
+              onClick={async () => {
+                setSelectedFarmer(farmer);
+
+                const response = await fetch(
+                  `http://localhost:5000/receipt/${farmer.receipt_id}`
+                );
+
+                const data = await response.json();
+                setReceipt(data);
+              }}
+              className="w-full rounded-2xl border border-gray-200 p-5 text-left hover:border-green-500"
+            >
+                <p className="text-xs font-bold uppercase text-gray-400">
+                  Farmer ID
+                </p>
+
+                <p className="text-lg font-bold">
+                  #{farmer.id}
+                </p>
+
+                <p className="mt-3 text-xs text-gray-400">
+                  Farmer Name
+                </p>
+
+                <p className="font-bold">
+                  {farmer.name}
+                </p>
+
+                <p className="mt-3 text-xs text-gray-400">
+                  Receipt ID
+                </p>
+
+                <p className="font-bold">
+                  #{farmer.receipt_id}
+                </p>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* LOAN APPLICATION */}
+        <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
+
+          <div>
+            <h2 className="text-xl font-bold">
+              Loan Applications
+            </h2>
+
+            <p className="mt-1 text-sm text-gray-500">
+              Review the farmer's application and decide whether to approve financing.
+            </p>
+          </div>
+
+          <div className="mt-6 space-y-4">
+
+            {applications.length === 0 ? (
+              <div className="rounded-xl bg-gray-50 p-5 text-sm text-gray-500">
+                No loan applications yet.
+              </div>
+            ) : (
+              applications.map((application) => (
+                <div
+                  key={application.id}
+                  className="rounded-2xl border border-gray-200 p-5"
+                >
+
+                  <div className="flex flex-col justify-between gap-5 md:flex-row">
+
+                    <div className="space-y-2">
+
+                      <p className="text-xs font-bold uppercase text-gray-400">
+                        Application #{application.id}
+                      </p>
+
+                      <h3 className="text-lg font-bold">
+                        {application.farmer}
+                      </h3>
+
+                      <p className="text-sm text-gray-600">
+                        Government-assigned loan amount:
+                        <span className="ml-2 font-bold text-[#176b3a]">
+                          ₹{Number(
+                            application.amount
+                          ).toLocaleString()}
+                        </span>
+                      </p>
+
+                      <p className="text-sm">
+                        Application Status:
+                        <span className="ml-2 font-bold">
+                          {application.status}
+                        </span>
+                      </p>
+
+                      <div className="mt-3 rounded-xl bg-gray-50 p-4">
+                        <p className="text-xs font-bold uppercase text-gray-400">
+                          Farmer Application Message
+                        </p>
+
+                        <p className="mt-2 text-sm text-gray-700">
+                          I request agricultural financing against my verified
+                          paddy warehouse receipt.
+                        </p>
+                      </div>
+
+                    </div>
+
+                    {application.status === "SUBMITTED" && (
+                      <div className="flex items-start gap-3">
+
+                        <button
+                          onClick={() =>
+                            approveLoan(application.id)
+                          }
+                          disabled={
+                            processing === application.id ||
+                            sensor?.status !== "SAFE"
+                          }
+                          className="rounded-xl bg-green-600 px-5 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-gray-300"
+                        >
+                          {processing === application.id
+                            ? "Processing..."
+                            : "Approve"}
+                        </button>
+
+                        <button
+                          onClick={() =>
+                            rejectLoan(application.id)
+                          }
+                          disabled={
+                            processing === application.id
+                          }
+                          className="rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-gray-300"
+                        >
+                          Reject
+                        </button>
+
+                      </div>
+                    )}
+
+                    {application.status === "APPROVED" && (
+                      <span className="rounded-full bg-green-100 px-4 py-2 text-xs font-bold text-green-700">
+                        APPROVED
+                      </span>
+                    )}
+
+                    {application.status === "REJECTED" && (
+                      <span className="rounded-full bg-red-100 px-4 py-2 text-xs font-bold text-red-700">
+                        REJECTED
+                      </span>
+                    )}
+
+                  </div>
                 </div>
+              ))
+            )}
 
-                <div>
-                  <h2 className="font-bold text-[#172018]">
-                    Receipt Created
-                  </h2>
+          </div>
 
-                  <p className="mt-0.5 text-xs text-green-700">
-                    Paddy intake successfully registered.
-                  </p>
-                </div>
-              </div>
-
-              <span className="flex w-fit items-center gap-1.5 rounded-full border border-green-200 bg-white px-3 py-1.5 text-[9px] font-bold uppercase tracking-wide text-green-700">
-                <CheckCircle2 size={12} />
-                Created
-              </span>
+          {message && (
+            <div className="mt-5 rounded-xl bg-blue-50 p-4 text-sm font-semibold text-blue-700">
+              {message}
             </div>
+          )}
 
-            <div className="grid gap-px bg-[#edf0eb] sm:grid-cols-2 lg:grid-cols-4">
+        </section>
 
-              <div className="bg-white p-5">
-                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#8a928b]">
-                  Token ID
-                </p>
-
-                <p className="mt-2 text-lg font-bold text-[#172018]">
-                  {receipt.tokenId ?? "Generated"}
-                </p>
-              </div>
-
-              <div className="bg-white p-5">
-                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#8a928b]">
-                  Farmer
-                </p>
-
-                <p className="mt-2 truncate text-sm font-semibold text-[#172018]">
-                  {receipt.farmer ?? farmer}
-                </p>
-              </div>
-
-              <div className="bg-white p-5">
-                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#8a928b]">
-                  Quantity
-                </p>
-
-                <p className="mt-2 text-sm font-semibold text-[#172018]">
-                  {receipt.quantity ?? quantity}
-                </p>
-              </div>
-
-              <div className="bg-white p-5">
-                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#8a928b]">
-                  Status
-                </p>
-
-                <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-green-600">
-                  <span className="h-2 w-2 rounded-full bg-green-500" />
-                  {receipt.status ?? "Created"}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 border-t border-[#edf0eb] px-6 py-3.5 text-[10px] text-[#8a928b]">
-              <ArrowRight size={13} />
-              Digital receipt is now available in the Farmer Portal.
-            </div>
-          </section>
-        )}
       </div>
     </main>
   );
